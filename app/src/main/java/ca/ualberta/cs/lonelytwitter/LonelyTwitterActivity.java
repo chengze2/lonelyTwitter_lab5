@@ -27,6 +27,8 @@ import com.google.gson.reflect.TypeToken;
 
 import android.util.Log;
 
+import io.searchbox.core.Search;
+
 
 public class LonelyTwitterActivity extends Activity {
 
@@ -66,8 +68,17 @@ public class LonelyTwitterActivity extends Activity {
 
 			public void onClick(View v) {
 				setResult(RESULT_OK);
+				String text = bodyText.getText().toString();
+				ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
 				tweetList.clear();
-				deleteFile(FILENAME);  // TODO deprecate this button
+				getTweetsTask.execute(text);
+				try {
+					tweetList.addAll(getTweetsTask.get());
+				}
+				catch (Exception e) {
+					Log.i("Error", "Fail");
+				}
+				// deleteFile(FILENAME);  // TODO deprecate this button
 				adapter.notifyDataSetChanged();
 			}
 		});
@@ -79,7 +90,7 @@ public class LonelyTwitterActivity extends Activity {
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		loadFromFile(); // TODO replace this with elastic search
+		//loadFromFile(); // TODO replace this with elastic search
 		ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
 		getTweetsTask.execute("");
 		try{
